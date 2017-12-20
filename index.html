@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+<title>Aesthetic Generator</title>
+
+<link rel='stylesheet'
+      href='https://fonts.googleapis.com/css?family=Oswald'
+      type='text/css'>
+    <style>
+      body {
+        font-family: 'Oswald', san serif;
+        font-size: 48px;
+      }
+    </style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <p id="good"></p>
+  <script>
+    var wordNikAPI = 'aaee2004de9f785e5600a0c7e7a060985c1ed47498c773c60';
+    var flickrAPI = 'e6dff77905cd49c777bfdae6a6c1b86e';
+    var googleFontAPI = 'AIzaSyBgB7pygBbZeDrtawk8eKKOdJrp1lcQSAY';
+
+    var client_id = '93407a2ea1ae4b748ef2725afd22ce56'; // Your client id
+	var client_secret = 'a219f3ed511f47d881afbb36e3a7230c'; // Your secret
+	var redirect_uri = 'http://homes.lmc.gatech.edu/~nfiroj3/'
+; // Your redirect uri
+
+
+	// array random picker
+	Array.prototype.pick = function() {
+		return this[Math.floor(Math.random()*this.length)];
+	}
+	String.prototype.toTitleCase = function () {
+    		return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+	};
+	String.prototype.toSentence = function () {
+    		return this.charAt(0).toUpperCase() + this.slice(1);;
+	};
+
+	// wordnik
+	var wordNikQuery = 'beauty';
+	$.ajax({
+		url: 'http://api.wordnik.com/v4/word.json/' + wordNikQuery + '/relatedWords?useCanonical=false&relationshipTypes=synonym&limitPerRelationshipType=10&api_key=' + wordNikAPI,
+
+	success: function(data) {
+		var ind1 = Math.floor(Math.random() * (data.length+1));
+      	// var ind2 = Math.floor(Math.random() * (data[ind1].length));
+		var word = data.pick().words.pick().toTitleCase();
+		$('#query').html('');
+		$('#query').append(word + ".");
+	},
+
+	async: true,
+	dataType:"json"
+	});
+
+
+	// title wordNik
+	$.ajax({
+  		url: 'http://api.wordnik.com:80/v4/word.json/fashion/phrases?limit=30&wlmi=0&useCanonical=false&api_key=' + wordNikAPI,
+	  	success: function(data) {	
+			var res = data.pick();	
+			var slogan = res.gram1;
+
+			slogan = slogan.toTitleCase();
+			$('#slogan').html('');
+			$('#slogan').append(slogan + " " + "style.");
+	  },
+	  async: true,
+	  dataType:"json"
+	});		
+			
+	// flickr
+	var flickrQuery = 'fashion';
+	$.ajax({
+	  url: 'https://api.flickr.com/services/rest/?method=flickr.photos.search&text=' + flickrQuery + '&format=json&nojsoncallback=1&api_key=' + flickrAPI,
+	  success: function(data) {	
+		// assemble Flickr image URL (as per https://www.flickr.com/services/api/misc.urls.html)
+		var photo = data.photos.photo.pick();
+		var imgUrl = "https://farm" + photo.farm + ".staticflickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + "_d.jpg";
+		
+		$('#image').html('');
+		$('#image').append('<img src="' + imgUrl + '"/>');
+	  },
+	  async: true,
+	  dataType:"json"
+	});
+
+	// spotify
+	var flickrQuery = 'fashion';
+	$.ajax({
+	  url: 'https://raw.githubusercontent.com/nishatfiroj/spotifyJSON/master/spotify.json',
+	  success: function(data) {	
+		var link = data.tracks.items.pick().external_urls.spotify;
+		$('#song').html('');
+		$('#song').append(link);
+	  },
+	  async: true,
+	  dataType:"json"
+	});
+
+</script>
+
+<body style="background-color:powderblue;">
+
+	<div style="text-align:center">
+
+	<div style="background-color:rgb(255, 99, 71);">
+	<div id="query"></div>
+	</div>
+
+	<div id="image"></div>
+
+	<div style="background-color:rgb(255, 99, 71);">
+	<div id="slogan"></div>
+	</div>
+
+	
+	<div style="font-size:50%;">
+	<p1>Click here for a song to match your aesthetic!</p1>
+	<div id="song">	</div>
+	</div>
+
+
+</body>
+</head>
+</html>
+
+
+
+
+
+
