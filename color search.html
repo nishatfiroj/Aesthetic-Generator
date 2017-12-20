@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>	
+		<title>Aesthetic Generator</title>
+		<style>
+	      body { font-family: helvetica, sans-serif; }
+	      ul { list-style: none; padding-left: 0; }
+	      li { margin-bottom: 0.1em; }
+	      b { color: red; }
+	    </style>
+	</head>
+
+	<style>
+		h1 {color:powderblue;}
+		body {margin: 10px; font-family: sans-serif;}
+
+		#nature
+		{
+			height: 600px
+			width: 300px;
+			margin: 0 auto;
+			padding: 15px;
+			overflow: hidden;
+			position: relative;
+		}
+		#human
+		{
+			height: 600px
+			width: 300px;
+			margin: 0 auto;
+			padding: 15px;
+			overflow: hidden;
+			position: relative;
+		}
+		#color
+		{
+			height: 600px
+			width: 300px;
+			margin: 0 auto;
+			padding: 15px;
+			overflow: hidden;
+			position: relative;
+		}
+	</style>
+
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+	<script src="js/html2canvas.js"></script>
+	<script src="js/markov.js"></script>
+
+	<script>
+		var FlickrAPIKey = 'e6dff77905cd49c777bfdae6a6c1b86e';
+
+		// array random picker
+		Array.prototype.pick = function() {
+			return this[Math.floor(Math.random()*this.length)];
+		}
+		String.prototype.toTitleCase = function () {
+	    		return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+		};
+		String.prototype.toSentence = function () {
+	    		return this.charAt(0).toUpperCase() + this.slice(1);;
+		};
+
+	</script>
+
+	<body style="background-color:azure;">
+		<h1><b id="marker">Aesthetic Generator</b></h1>
+		<input id="color" autofocus/>
+	    <ul id="colors">
+	    </ul>
+    <script>
+      $(function() {
+        var input = $('#color'),
+            ul = $('#colors'),
+            marker = $('#marker'),
+            timer = null,
+            request = {
+              keywords: "blue",
+              format: "json"
+            };
+        function perform_search() {
+          request.keywords = $.trim(input.val());
+          $.getJSON("http://www.colourlovers.com/api/colors?jsonCallback=?", request, function(colors, status, xhr) {
+            colors.sort(function(a, b) { return (a.hsv.value < b.hsv.value) ? -1 : (a.hsv.value > b.hsv.value) ? 1 : 0; });
+            ul.html("");
+            $.each(colors, function(index, col) {
+              if (index == 2) marker.css('color', '#' + col.hex);
+              $('<li></li>').css({'whitespace':'nowrap'})
+                            .append('<span style="display:inline-block;width:1.5em;background:#' + col.hex + '">&nbsp;</span> ')
+                            .append(col.title)
+                            .appendTo(ul);
+            });
+          });
+        }
+        input.keydown(function(event) {
+          switch(event.which) {
+            case 13:
+            case 9:
+              event.preventDefault();
+              perform_search();
+              break;
+            default:
+              if (timer) clearTimeout(timer);
+              timer = setTimeout(perform_search, 800);
+          }
+        });
+      });
+    </script>
+	</body>
+</html>
